@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Too Good To Go — Strategy Case Study</title>
+  <style>
+    :root {
+      --tgtg-green: #0f4c3a;
+      --tgtg-green-light: #1a6b52;
+      --tgtg-mint: #e8f5f0;
+      --tgtg-accent: #f4a261;
+      --text: #1a1a1a;
+      --text-muted: #4a5568;
+      --white: #ffffff;
+      --slide-padding: 3rem 3.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      background: #e2e8f0;
+      line-height: 1.45;
+    }
+
+    .deck {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .slide {
+      background: var(--white);
+      min-height: 720px;
+      padding: var(--slide-padding);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--tgtg-green), var(--tgtg-green-light));
+    }
+
+    .slide--title {
+      background: linear-gradient(145deg, var(--tgtg-green) 0%, #0a3328 100%);
+      color: var(--white);
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 720px;
+    }
+
+    .slide--title::before {
+      height: 0;
+    }
+
+    .slide--title .subtitle,
+    .slide--title .meta {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .slide--section {
+      background: var(--tgtg-mint);
+    }
+
+    .slide--section .slide-number {
+      color: var(--tgtg-green);
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--tgtg-green);
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--tgtg-green-light);
+      margin-bottom: 0.65rem;
+      margin-top: 1rem;
+    }
+
+    h3:first-of-type {
+      margin-top: 0;
+    }
+
+    .subtitle {
+      font-size: 1.35rem;
+      font-weight: 400;
+      max-width: 42rem;
+      margin-bottom: 2rem;
+    }
+
+    .meta {
+      font-size: 0.95rem;
+      margin-top: auto;
+      opacity: 0.9;
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+
+    .slide-number {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .slide-footer {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid #e2e8f0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li {
+      position: relative;
+      padding-left: 1.35rem;
+      margin-bottom: 0.65rem;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    ul li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--tgtg-accent);
+    }
+
+    .highlight-box {
+      background: var(--tgtg-mint);
+      border-left: 4px solid var(--tgtg-green);
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--tgtg-green);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      flex: 1;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .stat {
+      flex: 1;
+      min-width: 140px;
+      background: var(--white);
+      border: 2px solid var(--tgtg-green);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--tgtg-green);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .agenda-list {
+      counter-reset: agenda;
+    }
+
+    .agenda-list li {
+      counter-increment: agenda;
+      padding-left: 3rem;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .agenda-list li::before {
+      content: counter(agenda);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--tgtg-green);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 0;
+      left: 0;
+    }
+
+    .roadmap-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: start;
+    }
+
+    .roadmap-badge {
+      background: var(--tgtg-green);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .slide--title .logo-text {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .deck {
+        max-width: none;
+      }
+
+      .slide {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        page-break-inside: avoid;
+        min-height: 0;
+        height: 100vh;
+        width: 100%;
+      }
+
+      .slide:last-child {
+        page-break-after: auto;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+
+    <!-- Slide 1: Title -->
+    <section class="slide slide--title">
+      <p class="logo-text">Strategy Case Study</p>
+      <h1>Too Good To Go (TGTG)</h1>
+      <p class="subtitle">
+        Horizontal &amp; vertical integration on a two-sided platform:
+        network effects, competitive positioning, and non-market strategy
+      </p>
+      <p class="meta">Visual support deck — aligned with detailed case plan</p>
+    </section>
+
+    <!-- Slide 2: Agenda -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>Agenda</h2>
+        <span class="slide-number">Overview</span>
+      </div>
+      <ul class="agenda-list">
+        <li>Case framing &amp; strategic problem formulation</li>
+        <li>Two-sided platform economics &amp; network effects</li>
+        <li>Competitive positioning: WTP vs. cost dynamics</li>
+        <li>Scope of the firm: horizontal &amp; vertical integration</li>
+        <li>Non-market strategy &amp; ESG alignment</li>
+        <li>Operational recommendations &amp; roadmap</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Section 1 divider -->
+    <section class="slide slide--section">
+      <span class="slide-number">Section 1</span>
+      <h1 style="color: var(--tgtg-green); margin-top: 1rem;">Strategic Diagnosis</h1>
+      <p class="subtitle" style="color: var(--text); max-width: 36rem;">
+        Case framing &amp; formulation of the central strategic question
+      </p>
+    </section>
+
+    <!-- 1.1 Market breakthrough -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>1.1 Market Breakthrough</h2>
+        <span class="slide-number">Strategic diagnosis</span>
+      </div>
+      <h3>Transforming the surplus-food market</h3>
+      <ul>
+        <li>Shift from an unmonetized operational cost (waste &amp; spoilage) to a structured, monetized market.</li>
+        <li>The innovative <strong>Surprise Bag</strong> concept reduces SKU management burden for retailers.</li>
+        <li>Merchants turn end-of-day inventory from a liability into incremental revenue and foot traffic.</li>
+      </ul>
+      <div class="highlight-box">
+        Core insight: TGTG does not “create” food—it reallocates surplus that would otherwise be discarded, at near-zero marginal cost for partners.
+      </div>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- 1.2 Central question -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>1.2 Central Strategic Question</h2>
+        <span class="slide-number">Strategic diagnosis</span>
+      </div>
+      <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 1rem;">Causal strategic question</p>
+      <div class="highlight-box" style="font-size: 1.1rem; line-height: 1.5;">
+        How can Too Good To Go use horizontal and vertical integration to consolidate the network effects of its two-sided platform—while securing financial profitability in the face of disintermediation risks and pressure from large grocery incumbents?
+      </div>
+      <h3>Key tensions embedded in the question</h3>
+      <ul>
+        <li><strong>Scale vs. control:</strong> geographic and partner expansion without eroding platform stickiness.</li>
+        <li><strong>Growth vs. margin:</strong> subsidizing demand while monetizing supply sustainably.</li>
+        <li><strong>Platform vs. pipeline:</strong> avoiding bypass as partners and consumers learn the model.</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Section 2 divider -->
+    <section class="slide slide--section">
+      <span class="slide-number">Section 2</span>
+      <h1 style="color: var(--tgtg-green); margin-top: 1rem;">Two-Sided Platform Economics</h1>
+      <p class="subtitle" style="color: var(--text); max-width: 36rem;">
+        Pricing asymmetry, cross-subsidy, and network externalities
+      </p>
+    </section>
+
+    <!-- 2.1 Pricing -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>2.1 Pricing Asymmetry &amp; Cross-Subsidy</h2>
+        <span class="slide-number">Platform economics</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat">
+          <span class="stat-value">125M</span>
+          <span class="stat-label">Registered consumers (demand side)</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">175k</span>
+          <span class="stat-label">Partner stores (supply side)</span>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Demand side — consumers</h3>
+          <ul>
+            <li>Free access (€0)</li>
+            <li>Low entry barriers to maximize user density</li>
+            <li>Cross-subsidized by merchant fees</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Supply side — merchants</h3>
+          <ul>
+            <li>Fixed annual subscription: <strong>€89</strong></li>
+            <li>Variable commission: <strong>€1.79 per bag</strong></li>
+            <li>Surplus is marginal-cost-neutral or negative for partners</li>
+          </ul>
+        </div>
+      </div>
+      <h3>Economic rationale for merchants</h3>
+      <ul>
+        <li>Incremental revenue and in-store traffic</li>
+        <li><strong>61%</strong> new customers; <strong>41%</strong> make additional purchases</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- 2.2 Network effects -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>2.2 Network Effects &amp; Platform Dynamics</h2>
+        <span class="slide-number">Platform economics</span>
+      </div>
+      <h3>Indirect network externalities (local density)</h3>
+      <ul>
+        <li>More users in a geography → more attractive for stores to list bags.</li>
+        <li>More stores → more choice and convenience → more users.</li>
+        <li>Local density matters: value is geo-specific, not purely global.</li>
+      </ul>
+      <div class="two-col" style="margin-top: 1rem;">
+        <div class="card">
+          <h3>Switching costs</h3>
+          <ul>
+            <li>Habit, favorites, and saved payment flow on the app</li>
+            <li>Reputation &amp; ratings on the supply side</li>
+            <li>Operational integration for large chains</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Multi-homing &amp; disintermediation risk</h3>
+          <ul>
+            <li>Consumers may use several surplus-food apps</li>
+            <li>Merchants can list on competing platforms</li>
+            <li>Large retailers may internalize surplus sales</li>
+          </ul>
+        </div>
+      </div>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Section 3 divider -->
+    <section class="slide slide--section">
+      <span class="slide-number">Section 3</span>
+      <h1 style="color: var(--tgtg-green); margin-top: 1rem;">Competitive Positioning</h1>
+      <p class="subtitle" style="color: var(--text); max-width: 36rem;">
+        Willingness to pay vs. cost dynamics — “Quick Meal” or something else?
+      </p>
+    </section>
+
+    <!-- 3.1 WTP -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>3.1 Value Trade-offs &amp; Cost Structure</h2>
+        <span class="slide-number">Competitive positioning</span>
+      </div>
+      <h3>Does TGTG hold an advantage in “Quick Meal”?</h3>
+      <div class="two-col">
+        <div class="card">
+          <h3>Consumer trade-offs (costs)</h3>
+          <ul>
+            <li>Lower predictability (mystery bag)</li>
+            <li>Time constraint (pickup before closing)</li>
+            <li>No delivery — customer bears pickup cost</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Consumer trade-offs (benefits / WTP)</h3>
+          <ul>
+            <li>Deep discount (~<strong>70%</strong> off typical price)</li>
+            <li>Eco-responsible consumption narrative</li>
+            <li>Discovery &amp; variety at low price</li>
+          </ul>
+        </div>
+      </div>
+      <h3>Ultra-light cost structure (TGTG)</h3>
+      <ul>
+        <li>Zero COGS (food owned by partners)</li>
+        <li>Zero kitchen / preparation costs</li>
+        <li>Zero delivery cost (100% customer pickup)</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- 3.2 Positioning -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>3.2 Positioning Diagnosis</h2>
+        <span class="slide-number">Competitive positioning</span>
+      </div>
+      <div class="highlight-box">
+        TGTG is not a direct competitor to quick-service restaurants or delivery aggregators (Uber Eats, Deliveroo).
+      </div>
+      <h3>Strategic role in the value chain</h3>
+      <ul>
+        <li><strong>Complementor</strong> to the food retail &amp; hospitality chain—not a substitute for planned meals.</li>
+        <li>Occupies a <strong>dual niche</strong>: surplus recovery for partners + discounted, mission-driven meals for consumers.</li>
+        <li>Competes indirectly for “occasion” spend and attention, not for standard lunch/delivery occasions.</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Section 4 divider -->
+    <section class="slide slide--section">
+      <span class="slide-number">Section 4</span>
+      <h1 style="color: var(--tgtg-green); margin-top: 1rem;">Scope of the Firm</h1>
+      <p class="subtitle" style="color: var(--text); max-width: 36rem;">
+        Horizontal &amp; vertical integration — core strategic topic
+      </p>
+    </section>
+
+    <!-- 4.1 Horizontal -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>4.1 Horizontal Integration</h2>
+        <span class="slide-number">Scope of the firm</span>
+      </div>
+      <h3>Scale &amp; scope expansion</h3>
+      <ul>
+        <li><strong>Geographic scaling:</strong> international presence in <strong>19 countries</strong> (Europe &amp; North America) to reach critical mass.</li>
+        <li><strong>Partner segment diversification:</strong> from independent merchants (<strong>~119k</strong>) toward large grocery &amp; hospitality accounts (<strong>~85k</strong> outlets).</li>
+      </ul>
+      <h3>Illustrative large-account partners</h3>
+      <ul>
+        <li>Grocery: Carrefour, Aldi, Whole Foods</li>
+        <li>Hospitality: Accor and similar chains</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.95rem;">
+        Horizontal moves widen the network, improve local density, and raise barriers for smaller rival platforms.
+      </p>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- 4.2 Vertical -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>4.2 Vertical &amp; Technological Integration</h2>
+        <span class="slide-number">Scope of the firm</span>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Downstream / B2B SaaS — TGTG Platforms</h3>
+          <ul>
+            <li>Acquisition of <strong>CodaBene</strong></li>
+            <li>Expiry-date management embedded in supermarket IT</li>
+            <li>From reactive resale to proactive in-store waste prevention</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Upstream — TGTG Parcels</h3>
+          <ul>
+            <li>Direct engagement with FMCG manufacturers</li>
+            <li>Capture factory-level overstock before retail</li>
+            <li>Extends supply beyond store closing hours</li>
+          </ul>
+        </div>
+      </div>
+      <h3>Technological integration</h3>
+      <ul>
+        <li>In-house ownership of core IT stack</li>
+        <li>Deployment of <strong>dynamic pricing algorithms</strong> to improve sell-through at closing time</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Section 5 divider -->
+    <section class="slide slide--section">
+      <span class="slide-number">Section 5</span>
+      <h1 style="color: var(--tgtg-green); margin-top: 1rem;">Non-Market Strategy &amp; ESG</h1>
+      <p class="subtitle" style="color: var(--text); max-width: 36rem;">
+        Regulatory leverage and impact-aligned business model
+      </p>
+    </section>
+
+    <!-- 5.1 Regulatory -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>5.1 Regulatory &amp; Institutional Leverage</h2>
+        <span class="slide-number">Non-market strategy</span>
+      </div>
+      <h3>Binding legislative frameworks</h3>
+      <ul>
+        <li>France: <strong>Loi Garot</strong> and related obligations on food waste</li>
+        <li>EU directives setting quantitative waste-reduction targets</li>
+        <li>Rising compliance costs for retailers → demand for turnkey solutions</li>
+      </ul>
+      <h3>Strategic implication</h3>
+      <ul>
+        <li>Regulation shifts surplus from “optional CSR” to operational necessity.</li>
+        <li>TGTG + TGTG Platforms positioned as compliance and reporting partners—not only a consumer app.</li>
+      </ul>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- 5.2 B-Corp -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>5.2 Impact Model &amp; Financial Viability</h2>
+        <span class="slide-number">Non-market strategy</span>
+      </div>
+      <p style="margin-bottom: 1rem;"><strong>B-Corp certified</strong> — alignment of social/environmental value with commercial sustainability.</p>
+      <div class="stat-row">
+        <div class="stat">
+          <span class="stat-value">450M</span>
+          <span class="stat-label">Meals saved (cumulative impact)</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">1.34M t</span>
+          <span class="stat-label">CO₂ emissions avoided</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">2023</span>
+          <span class="stat-label">Break-even achieved</span>
+        </div>
+      </div>
+      <div class="highlight-box">
+        Non-market assets (trust, brand, policy alignment) reinforce market strategy: easier enterprise sales, consumer acquisition, and defense against “greenwashing” rivals.
+      </div>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Section 6 divider -->
+    <section class="slide slide--section">
+      <span class="slide-number">Section 6</span>
+      <h1 style="color: var(--tgtg-green); margin-top: 1rem;">Operational Recommendations</h1>
+      <p class="subtitle" style="color: var(--text); max-width: 36rem;">
+        Actionable strategic roadmap
+      </p>
+    </section>
+
+    <!-- 6 Roadmap -->
+    <section class="slide">
+      <div class="slide-header">
+        <h2>6. Strategic Roadmap — Three Axes</h2>
+        <span class="slide-number">Recommendations</span>
+      </div>
+      <div class="roadmap-item">
+        <span class="roadmap-badge">Axis 1</span>
+        <div>
+          <h3 style="margin-top: 0;">Vertical integration — B2B SaaS</h3>
+          <p>Monetize <strong>TGTG Platforms</strong> (ex-CodaBene) via recurring SaaS subscriptions with major grocery chains—moving from marketplace fees alone to embedded software revenue.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <span class="roadmap-badge">Axis 2</span>
+        <div>
+          <h3 style="margin-top: 0;">Horizontal integration — North America</h3>
+          <p>Accelerate U.S./Canada penetration through framework agreements with regional supermarket chains, replicating European large-account playbook at scale.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <span class="roadmap-badge">Axis 3</span>
+        <div>
+          <h3 style="margin-top: 0;">Platform optimization</h3>
+          <p>Roll out <strong>algorithmic dynamic pricing</strong> broadly to maximize bag sell-through during store-closing windows and improve unit economics per partner.</p>
+        </div>
+      </div>
+      <div class="slide-footer">Too Good To Go — Strategy Case Study</div>
+    </section>
+
+    <!-- Closing -->
+    <section class="slide slide--title">
+      <p class="logo-text">Summary</p>
+      <h1>Integrate to defend the platform</h1>
+      <p class="subtitle">
+        Horizontal scale builds network density; vertical integration (SaaS, parcels, tech) raises switching costs and margins; non-market strategy turns regulation and impact into competitive moats.
+      </p>
+      <p class="meta">Questions &amp; discussion</p>
+    </section>
+
+  </div>
+</body>
+</html>
