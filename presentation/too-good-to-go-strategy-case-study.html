@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Too Good To Go — Strategy Case Study</title>
+  <script src="slide-editor-kit.js"></script>
+  <script>
+    window.__SLIDE_EDITOR_KIT_CONFIG__ = {
+      downloadBasename: "too-good-to-go-strategy-case-study"
+    };
+  </script>
   <style>
     :root {
       --tgtg-green: #0d9488;
@@ -54,7 +60,7 @@
       flex-direction: column;
     }
 
-    .slide:last-child {
+    body > section.slide:last-of-type {
       page-break-after: auto;
       break-after: auto;
     }
@@ -619,10 +625,14 @@
         margin: 0;
         box-shadow: none;
       }
+      body > section.slide:last-of-type {
+        page-break-after: auto;
+        break-after: auto;
+      }
     }
   </style>
 </head>
-<body>
+<body class="has-editor">
 
   <!-- Slide 1: Title -->
   <section class="slide slide-title">
@@ -868,9 +878,9 @@
             </marker>
           </defs>
           <line x1="500" y1="95" x2="500" y2="175" marker-end="url(#arrowhead)" />
-          <line x1="500" y1="345" x2="500" y2="425" marker-end="url(#arrowhead)" />
+          <line x1="500" y1="425" x2="500" y2="345" marker-end="url(#arrowhead)" />
           <line x1="175" y1="260" x2="318" y2="260" marker-end="url(#arrowhead)" />
-          <line x1="682" y1="260" x2="825" y2="260" marker-end="url(#arrowhead)" />
+          <line x1="825" y1="260" x2="682" y2="260" marker-end="url(#arrowhead)" />
         </svg>
 
         <article class="force-box force-top">
@@ -905,7 +915,7 @@
           <span class="force-intensity force-intensity--low">Low</span>
           <ul>
             <li>Highly fragmented demand</li>
-            <li>Zero signup &amp; switching costs</li>
+            <li>Zero signup costs</li>
           </ul>
         </article>
 

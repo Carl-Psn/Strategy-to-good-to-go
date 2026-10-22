@@ -1,0 +1,43 @@
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  SLIDE EDITOR KIT — bloc à réutiliser sur vos prochaines présentations HTML
+  ═══════════════════════════════════════════════════════════════════════════
+
+  ÉTAPE A — Copier le fichier slide-editor-kit.js dans le même dossier que votre .html
+
+  ÉTAPE B — Au DÉBUT de votre fichier (dans <head>, juste après <meta charset> par ex.) :
+
+      <script src="slide-editor-kit.js"></script>
+      <script>
+        window.__SLIDE_EDITOR_KIT_CONFIG__ = {
+          downloadBasename: "mon-sujet-presentation",
+          // editableSelectors: [".slide-header h2", ".slide-body"]  // optionnel
+        };
+      </script>
+
+  ÉTAPE C — Sur la balise <body>, ajouter la classe has-editor :
+
+      <body class="has-editor">
+
+  ÉTAPE D — Structure de chaque slide (obligatoire : classe "slide") :
+
+      <section class="slide">
+        <header class="slide-header"><h2>Titre</h2></header>
+        <div class="slide-body">Contenu…</div>
+        <footer class="slide-footer"><span>Projet</span><span>Slide 1</span></footer>
+      </section>
+
+  ÉTAPE E — CSS de vos slides : préférez la dernière slide sans page blanche à l'impression :
+
+      body > section.slide:last-of-type {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+  (Le kit resynchronise aussi les sauts de page à la suppression et avant l'impression.)
+
+  WORKFLOW : ouvrir dans le navigateur → éditer → Télécharger le HTML → Imprimer / PDF
+  Gardez slide-editor-kit.js à côté du fichier, ou rouvrez le HTML téléchargé (kit inclus via script src).
+
+  ═══════════════════════════════════════════════════════════════════════════
+-->
